@@ -1,0 +1,24 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "Main and final chunking.py",
+        "use": "@vercel/python"
+      },
+      {
+        "src": "Pre-Processing main.py",
+        "use": "@vercel/python"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "Main and final chunking.py"
+      },
+      {
+        "src": "/preprocess",
+        "dest": "Pre-Processing main.py"
+      }
+    ]
+  }
+  
