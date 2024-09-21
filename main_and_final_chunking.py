@@ -1,15 +1,5 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[20]:
-
-
 
 ##Fixed size character chunking
-
-
-# In[3]:
-
 
 
 from fastapi import FastAPI
@@ -167,14 +157,9 @@ for i, chunk in enumerate(fixed_size_chunks, 1):
 
 
 
-
-# In[2]:
-
-
 ##Sentence Wise Chunking
 
 
-# In[5]:
 
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -196,13 +181,13 @@ for i, chunk in enumerate(sentence_chunks, 1):
     print(f"Chunk {i}:\n{chunk}\n")
 
 
-# In[5]:
+
 
 
 ##Paragraph wise Chunking
 
 
-# In[74]:
+
 
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -224,13 +209,12 @@ for i, chunk in enumerate(paragraph_chunks, 1):
     print(f"Chunk {i}:\n{chunk}\n")
 
 
-# In[26]:
+
 
 
 ## Semantic Chunking
 
 
-# In[55]:
 
 
 import re
@@ -239,26 +223,25 @@ def split_para_to_sentence(text):
     return sentences
 
 
-# In[56]:
+
 
 
 split_para_to_sentence(text)
 
 
-# In[17]:
 
 
 from langchain.embeddings import HuggingFaceEmbeddings
 embeddings = HuggingFaceEmbeddings (model_name="BAAI/bge-large-en-v1.5")
 
 
-# In[57]:
+
 
 
 len(embeddings.embed_query("vaibhavi"))
 
 
-# In[58]:
+
 
 
 import numpy as np
@@ -286,56 +269,36 @@ def create_semantic_chunks(sentences):
     return semantic_chunks
 
 
-# In[59]:
 
 
 sentences = split_para_to_sentence(text)
 
 
-# In[60]:
+
 
 
 sentences
 
 
-# In[38]:
+
 
 
 create_semantic_chunks(sentences)
 
 
-# In[39]:
+
 
 
 chunks = create_semantic_chunks(sentences)
 
-
-# In[40]:
-
-
 len(chunks)
 
-
-# In[75]:
-
-
 chunks[0]
-
-
-# In[77]:
-
 
 chunks[1]
 
 
-# In[50]:
-
-
 ## Topic based semantic chunking and Contextual semantic chunking
-
-
-# In[67]:
-
 
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
@@ -408,15 +371,6 @@ print("\nContextual Chunks:")
 for i, chunk in enumerate(contextual_chunks):
     print(f"Chunk {i+1}: {chunk}")
 
-
-
-# In[ ]:
-
-
-
-
-
-# In[69]:
 
 
 import numpy as np
@@ -658,19 +612,19 @@ for i, chunk in enumerate(contextual_chunks):
 
 
 
-# In[70]:
+
 
 
 len(topic_chunks)
 
 
-# In[71]:
+
 
 
 len(contextual_chunks)
 
 
-# In[ ]:
+
 
 
 
