@@ -11,7 +11,13 @@ from sklearn.cluster import KMeans
 import re
 
 app = FastAPI()
-embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-large-en-v1.5")
+
+# Lazy loading: Define a function to load the embeddings model
+def get_embeddings():
+    return HuggingFaceEmbeddings(model_name="BAAI/bge-large-en-v1.5", cache_dir="/tmp")
+
+# Global variable for embeddings (not loaded initially)
+embeddings = None
 
 # Fixed Size Chunking
 def fixed_size_chunking(text, chunk_size):
@@ -20,6 +26,9 @@ def fixed_size_chunking(text, chunk_size):
 
 @app.post("/fixed_size_chunking/")
 async def api_fixed_size_chunking(text: str, chunk_size: int):
+    global embeddings
+    if embeddings is None:
+        embeddings = get_embeddings()  # Load the model only when the first request comes in
     result = fixed_size_chunking(text, chunk_size)
     return {"result": result}
 
@@ -50,6 +59,11 @@ def split_para_to_sentence(text):
     return re.split(r'(?<=[.])\s+', text)
 
 def create_semantic_chunks(sentences):
+    global embeddings
+    # Lazy loading of embeddings model
+    if embeddings is None:
+        embeddings = get_embeddings()
+
     sen_embeddings = [np.array(embeddings.embed_query(sentence)).reshape(1, -1) for sentence in sentences]
     semantic_chunks = []
 
@@ -62,7 +76,7 @@ def create_semantic_chunks(sentences):
                 semantic_chunks[-1].append(sentences[i])
             else:
                 semantic_chunks.append([sentences[i]])
-    
+
     return semantic_chunks
 
 @app.post("/semantic_chunking/")
@@ -73,7 +87,13 @@ async def api_semantic_chunking(text: str):
 
 # Topic-Based Chunking
 def create_topic_based_chunks(sentences, n_topics=3):
+    global embeddings
+    # Lazy loading of embeddings model
+    if embeddings is None:
+        embeddings = get_embeddings()
+
     sen_embeddings = np.array([embeddings.embed_query(sentence) for sentence in sentences])
+    
     kmeans = KMeans(n_clusters=n_topics, random_state=42)
     sentence_clusters = kmeans.fit_predict(sen_embeddings)
     
@@ -91,6 +111,11 @@ async def api_topic_chunking(text: str, n_topics: int = 3):
 
 # Contextual Chunking
 def create_contextual_chunks(sentences, similarity_threshold=0.5):
+    global embeddings
+    # Lazy loading of embeddings model
+    if embeddings is None:
+        embeddings = get_embeddings()
+
     sen_embeddings = [np.array(embeddings.embed_query(sentence)).reshape(1, -1) for sentence in sentences]
     contextual_chunks = []
 
