@@ -4,18 +4,124 @@
 # In[20]:
 
 
+
 ##Fixed size character chunking
 
 
 # In[3]:
 
+
+
 from fastapi import FastAPI
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.embeddings import HuggingFaceEmbeddings
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.cluster import KMeans
+import re
 
 app = FastAPI()
+embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-large-en-v1.5")
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+# Fixed Size Chunking
+def fixed_size_chunking(text, chunk_size):
+    splitter = CharacterTextSplitter(separator="", chunk_size=chunk_size, chunk_overlap=10)
+    return splitter.split_text(text)
+
+@app.post("/fixed_size_chunking/")
+async def api_fixed_size_chunking(text: str, chunk_size: int):
+    result = fixed_size_chunking(text, chunk_size)
+    return {"result": result}
+
+# Sentence Wise Chunking
+@app.post("/sentence_chunking/")
+async def api_sentence_chunking(text: str):
+    sentence_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=0,
+        separators=[". ", "? ", "! "]
+    )
+    result = sentence_splitter.split_text(text)
+    return {"result": result}
+
+# Paragraph Wise Chunking
+@app.post("/paragraph_chunking/")
+async def api_paragraph_chunking(text: str):
+    paragraph_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=2000,
+        chunk_overlap=0,
+        separators=["\n\n", "\n"]
+    )
+    result = paragraph_splitter.split_text(text)
+    return {"result": result}
+
+# Semantic Chunking
+def split_para_to_sentence(text):
+    return re.split(r'(?<=[.])\s+', text)
+
+def create_semantic_chunks(sentences):
+    sen_embeddings = [np.array(embeddings.embed_query(sentence)).reshape(1, -1) for sentence in sentences]
+    semantic_chunks = []
+
+    for i in range(len(sentences)):
+        if i == 0:
+            semantic_chunks.append([sentences[i]])
+        else:
+            similarity = cosine_similarity(sen_embeddings[i-1], sen_embeddings[i])
+            if similarity[0][0] > 0.5:
+                semantic_chunks[-1].append(sentences[i])
+            else:
+                semantic_chunks.append([sentences[i]])
+    
+    return semantic_chunks
+
+@app.post("/semantic_chunking/")
+async def api_semantic_chunking(text: str):
+    sentences = split_para_to_sentence(text)
+    result = create_semantic_chunks(sentences)
+    return {"result": result}
+
+# Topic-Based Chunking
+def create_topic_based_chunks(sentences, n_topics=3):
+    sen_embeddings = np.array([embeddings.embed_query(sentence) for sentence in sentences])
+    kmeans = KMeans(n_clusters=n_topics, random_state=42)
+    sentence_clusters = kmeans.fit_predict(sen_embeddings)
+    
+    topic_chunks = [[] for _ in range(n_topics)]
+    for i, cluster in enumerate(sentence_clusters):
+        topic_chunks[cluster].append(sentences[i])
+
+    return topic_chunks
+
+@app.post("/topic_chunking/")
+async def api_topic_chunking(text: str, n_topics: int = 3):
+    sentences = split_para_to_sentence(text)
+    result = create_topic_based_chunks(sentences, n_topics)
+    return {"result": result}
+
+# Contextual Chunking
+def create_contextual_chunks(sentences, similarity_threshold=0.5):
+    sen_embeddings = [np.array(embeddings.embed_query(sentence)).reshape(1, -1) for sentence in sentences]
+    contextual_chunks = []
+
+    for i in range(len(sentences)):
+        if i == 0:
+            contextual_chunks.append([sentences[i]])
+        else:
+            similarity = cosine_similarity(sen_embeddings[i-1], sen_embeddings[i])
+            if similarity[0][0] > similarity_threshold:
+                contextual_chunks[-1].append(sentences[i])
+            else:
+                contextual_chunks.append([sentences[i]])
+    
+    return contextual_chunks
+
+@app.post("/contextual_chunking/")
+async def api_contextual_chunking(text: str, similarity_threshold: float = 0.5):
+    sentences = split_para_to_sentence(text)
+    result = create_contextual_chunks(sentences, similarity_threshold)
+    return {"result": result}
+
 
 
 from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
