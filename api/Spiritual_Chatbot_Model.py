@@ -11,8 +11,10 @@ from sentence_transformers import SentenceTransformer
 from langchain.chains.question_answering import load_qa_chain
 import pinecone
 import os
+from fastapi import FastAPI, HTTPException
+import asyncio
 
-
+app = FastAPI()
 # #**Load the Data**
 
 # In[ ]:
@@ -95,7 +97,7 @@ data
 from langchain.schema import Document
 
 data1 = [Document(page_content=data)]
-print(data1)
+# print(data1)
 
 
 # In[55]:
@@ -199,30 +201,45 @@ docsearch = Pinecone.from_documents(docs, embeddings, index_name=index_name)
 # In[71]:
 
 
-query="which are eastern zones"
+# query="which are eastern zones"
 
 
-# In[72]:
+# # In[72]:
 
 
-docs=docsearch.similarity_search(query)
+# docs=docsearch.similarity_search(query)
 
 
-# In[73]:
+# # In[73]:
 
 
-# Perform similarity search with the query
-docs = docsearch.similarity_search(query)
+# # Perform similarity search with the query
+# docs = docsearch.similarity_search(query)
 
-# Display the top 1 chunk
-if docs:
-    print(f"Top 1 Chunk:\n{docs[0].page_content}\n")
-else:
-    print("No results found.")
-
-
-# In[ ]:
+# # Display the top 1 chunk
+# if docs:
+#     print(f"Top 1 Chunk:\n{docs[0].page_content}\n")
+# else:
+#     print("No results found.")
 
 
+# # In[ ]:
+
+QUERY = "which are eastern zones"
+
+# Define the endpoint
+@app.get("/search/")
+async def search():
+    try:
+        # Perform similarity search
+        docs = docsearch.similarity_search(QUERY)
+
+        # Return the top 1 result or a message if no results are found
+        if docs:
+            return {"top_chunk": docs[0].page_content}
+        else:
+            return {"message": "No results found"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
