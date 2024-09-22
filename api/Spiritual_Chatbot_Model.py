@@ -1,7 +1,4 @@
-
-
-
-# #**Step 2: Import All the Required Libraries**
+ #**Step 2: Import All the Required Libraries**
 
 # In[3]:
 
@@ -21,14 +18,7 @@ import os
 # In[ ]:
 
 
-
-
-
 # In[ ]:
-
-
-
-
 
 # In[35]:
 
