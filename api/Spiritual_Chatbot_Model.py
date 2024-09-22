@@ -3,16 +3,18 @@
 # In[3]:
 
 
-from langchain.document_loaders import PyPDFLoader, OnlinePDFLoader
+# from langchain.document_loaders import PyPDFLoader, OnlinePDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import Pinecone
-from sentence_transformers import SentenceTransformer
-from langchain.chains.question_answering import load_qa_chain
-import pinecone
+# from sentence_transformers import SentenceTransformer
+# from langchain.chains.question_answering import load_qa_chain
 import os
 from fastapi import FastAPI, HTTPException
-import asyncio
+# import asyncio
+from langchain.schema import Document
+from pinecone import Pinecone, ServerlessSpec
+from langchain.vectorstores import Pinecone
 
 app = FastAPI()
 # #**Load the Data**
@@ -94,7 +96,7 @@ data
 
 
 #data1 = [{"page_content": data}]
-from langchain.schema import Document
+
 
 data1 = [Document(page_content=data)]
 # print(data1)
@@ -146,7 +148,7 @@ embeddings=HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6
 # In[65]:
 
 
-from pinecone import Pinecone, ServerlessSpec
+
 
 # Replace with your actual Pinecone API key and environment
 PINECONE_API_KEY = '5dbf1d73-7ca2-4c88-b952-dc315eb86f98'
@@ -186,8 +188,7 @@ if index_name not in pc.list_indexes().names():
 
 
 #docsearch=Pinecone.from_documents([t.page_content for t in docs], embeddings, index_name=index_name)
-from langchain.vectorstores import Pinecone
-import pinecone
+
 
 os.environ["PINECONE_API_KEY"] ='5dbf1d73-7ca2-4c88-b952-dc315eb86f98'
 

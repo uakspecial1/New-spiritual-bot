@@ -1,7 +1,5 @@
 fastapi
 langchain
-transformers
-huggingface-hub
-scikit-learn
 uvicorn[standard]  # Required to run FastAPI on Vercel
-numpy
+pinecone
+
