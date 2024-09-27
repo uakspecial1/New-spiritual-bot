@@ -108,13 +108,15 @@ vector_store.add_texts([doc.page_content for doc in docs])
 QUERY = "which are eastern zones"
 
 # Define the endpoint
-@app.get("/search/")
+@app.get("/")              
 async def search():
+    print("Hello World")
     try:
         # Perform similarity search
         results = vector_store.similarity_search(QUERY)
 
         # pass the query para
+        # url
 
         # Return the top 1 result or a message if no results are found
         if results:
