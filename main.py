@@ -114,6 +114,8 @@ async def search():
         # Perform similarity search
         results = vector_store.similarity_search(QUERY)
 
+        # pass the query para
+
         # Return the top 1 result or a message if no results are found
         if results:
             return {"top_chunk": results[0].page_content}
