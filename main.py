@@ -110,21 +110,21 @@ QUERY = "which are eastern zones"
 # Define the endpoint
 @app.get("/")              
 async def search():
-    print("Hello World")
-    try:
-        # Perform similarity search
-        results = vector_store.similarity_search(QUERY)
+    return ("Hello World")
+    # try:
+    #     # Perform similarity search
+    #     results = vector_store.similarity_search(QUERY)
 
-        # pass the query para
-        # url
+    #     # pass the query para
+    #     # url
 
-        # Return the top 1 result or a message if no results are found
-        if results:
-            return {"top_chunk": results[0].page_content}
-        else:
-            return {"message": "No results found"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    #     # Return the top 1 result or a message if no results are found
+    #     if results:
+    #         return {"top_chunk": results[0].page_content}
+    #     else:
+    #         return {"message": "No results found"}
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=str(e))
 
 
 
