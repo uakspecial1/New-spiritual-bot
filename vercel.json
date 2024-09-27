@@ -2,14 +2,14 @@
     "version": 2,
     "builds": [
       {
-        "src": "/api/Spiritual_Chatbot_Model.py",
+        "src": "/api/sample.py",
         "use": "@vercel/python"
       }
     ],
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "/api/Spiritual_Chatbot_Model.py"
+        "dest": "/api/sample.py"
       }
     ]
   }
